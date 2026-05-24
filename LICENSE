@@ -1,0 +1,48 @@
+MIT License
+
+Copyright (c) 2026 inkarnation
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+NOTE ON SCOPE
+
+This MIT license covers only the packaging artifacts in this repository:
+the Dockerfile, the docker-compose.yml, the helper scripts under scripts/,
+the GitHub Actions workflows, and the documentation.
+
+It does NOT relicense the software installed inside the built Docker image.
+In particular:
+
+  - CloudCLI (@cloudcli-ai/cloudcli, https://github.com/siteboon/claudecodeui)
+    is distributed under the GNU Affero General Public License v3.0 or later
+    (AGPL-3.0-or-later) with additional terms under Section 7. Anyone
+    distributing the built image, or running it as a publicly accessible
+    network service, must comply with the AGPL — including AGPL Section 13,
+    which requires making the corresponding source code available to remote
+    users of any modified version.
+
+  - Claude Code (@anthropic-ai/claude-code) is distributed under its own
+    terms by Anthropic; see https://docs.anthropic.com/en/docs/claude-code.
+
+  - Other system packages installed via apt and npm carry their own licenses.
+
+The maintainer of this packaging repository is not affiliated with
+Siteboon AI B.V. or Anthropic.
