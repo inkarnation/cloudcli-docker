@@ -37,21 +37,26 @@ RUN userdel -r node 2>/dev/null || true \
     && groupadd -g ${PGID} claude \
     && useradd -m -u ${PUID} -g ${PGID} -s /bin/bash claude
 
-RUN mkdir -p /workspaces /home/claude/.claude /home/claude/.config \
-    && chown -R claude:claude /workspaces /home/claude
+RUN mkdir -p \
+        /home/claude/workspaces \
+        /home/claude/.claude \
+        /home/claude/.cloudcli \
+        /home/claude/.config \
+    && touch /home/claude/.claude.json \
+    && chown -R claude:claude /home/claude
 
 COPY --chmod=0755 scripts/cc-workspace /usr/local/bin/cc-workspace
 COPY --chmod=0755 scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 
-# Entrypoint runs as root, applies PUID/PGID env (if set), chowns
-# /workspaces and $HOME, then drops to the claude user via gosu.
-WORKDIR /workspaces
+# Entrypoint runs as root, applies PUID/PGID env (if set), chowns the data
+# dirs under $HOME, then drops to the claude user via gosu.
+WORKDIR /home/claude/workspaces
 
 ENV HOME=/home/claude \
     TZ=UTC \
     CLOUDCLI_HOST=0.0.0.0 \
     CLOUDCLI_PORT=3001 \
-    WORKSPACES_DIR=/workspaces
+    WORKSPACES_DIR=/home/claude/workspaces
 
 EXPOSE 3001
 

@@ -3,7 +3,7 @@
 Containerized [CloudCLI UI](https://github.com/siteboon/claudecodeui) (web UI for Claude Code)
 for self-hosting on a VPS. The image bundles `@cloudcli-ai/cloudcli`,
 `@anthropic-ai/claude-code`, Git, and the Docker CLI on Node 22 (Debian slim).
-Workspaces live as subdirectories under `/workspaces` and are persisted to the host via a
+Workspaces live as subdirectories under `/home/claude/workspaces` and are persisted to the host via a
 bind mount.
 
 What's in this repo:
@@ -42,10 +42,10 @@ docker exec -it cloudcli cc-workspace remove project-a
 
 # Handy host alias
 alias ccw='docker exec -it cloudcli cc-workspace'
-ccw create project-b --template /workspaces/_template
+ccw create project-b --template /home/claude/workspaces/_template
 ```
 
-Then in the UI hit "Open Project" → pick `/workspaces/<name>`. Claude Code creates its
+Then in the UI hit "Open Project" → pick `/home/claude/workspaces/<name>`. Claude Code creates its
 session data under `~/.claude/projects/...` and CloudCLI picks the project up
 automatically.
 
@@ -87,7 +87,7 @@ docker exec -it cloudcli cc-workspace list   # → demo
 docker compose logs -f cloudcli
 ```
 
-UI: http://127.0.0.1:3001 — "Open Project" → `/workspaces/demo`.
+UI: http://127.0.0.1:3001 — "Open Project" → `/home/claude/workspaces/demo`.
 
 ## License / sources
 

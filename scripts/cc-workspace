@@ -14,7 +14,7 @@
 
 set -euo pipefail
 
-WORKSPACES_DIR="${WORKSPACES_DIR:-/workspaces}"
+WORKSPACES_DIR="${WORKSPACES_DIR:-/home/claude/workspaces}"
 SELF="$(basename "$0")"
 
 die()  { echo "${SELF}: $*" >&2; exit 1; }
@@ -117,7 +117,7 @@ Commands:
   open   <name>                               Print 'cd <path>' for eval
 
 Environment:
-  WORKSPACES_DIR        Base directory (default: /workspaces)
+  WORKSPACES_DIR        Base directory (default: /home/claude/workspaces)
   CC_WORKSPACE_FORCE=1  Skip confirmation for 'remove'
 EOF
 }

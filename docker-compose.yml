@@ -21,6 +21,11 @@ services:
       PGID: ${PGID:-1000}
     volumes:
       # Workspaces — your project trees live here.
-      - ./workspaces:/workspaces
-      # Persist Claude credentials/sessions/skills/plugins across restarts.
+      - ./workspaces:/home/claude/workspaces
+      # Claude Code data: sessions, credentials, plugins, MCP, skills, commands.
       - ./claude-home:/home/claude/.claude
+      # Global Claude config (MCP server registry + other top-level settings).
+      # Must exist as a file before `docker compose up` — run scripts/init.sh.
+      - ./claude.json:/home/claude/.claude.json
+      # CloudCLI's own SQLite database: users, project list, UI prefs.
+      - ./cloudcli-data:/home/claude/.cloudcli

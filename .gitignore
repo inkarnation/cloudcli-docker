@@ -3,5 +3,7 @@
 !.env.example
 workspaces/
 claude-home/
+cloudcli-data/
+claude.json
 *.log
 .DS_Store
