@@ -1,0 +1,21 @@
+services:
+  cloudcli:
+    # Default to local build. Swap for `image: ghcr.io/<owner>/cloudcli-setup:latest`.
+    build:
+      context: .
+      args:
+        USER_UID: ${USER_UID:-1000}
+        USER_GID: ${USER_GID:-1000}
+    image: cloudcli-setup:dev
+    container_name: cloudcli
+    restart: unless-stopped
+    ports:
+      - "${CLOUDCLI_BIND:-127.0.0.1}:${CLOUDCLI_PORT:-3001}:3001"
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      TZ: ${TZ:-UTC}
+    volumes:
+      # Workspaces — your project trees live here.
+      - ./workspaces:/workspaces
+      # Persist Claude credentials/sessions/skills/plugins across restarts.
+      - ./claude-home:/home/claude/.claude

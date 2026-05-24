@@ -1,0 +1,139 @@
+#!/usr/bin/env bash
+# cc-workspace — manage CloudCLI workspaces.
+#
+# Each workspace is a directory under ${WORKSPACES_DIR} (default: /workspaces).
+# Run inside the container, or from the host via:
+#   docker exec -it <container> cc-workspace <cmd> ...
+#
+# Commands:
+#   create <name> [--git] [--template <path>]   Create a new workspace
+#   list                                        List existing workspaces
+#   remove <name>                               Delete a workspace (with confirm)
+#   path   <name>                               Print absolute path
+#   open   <name>                               cd-friendly: prints `cd <path>`
+
+set -euo pipefail
+
+WORKSPACES_DIR="${WORKSPACES_DIR:-/workspaces}"
+SELF="$(basename "$0")"
+
+die()  { echo "${SELF}: $*" >&2; exit 1; }
+info() { echo "${SELF}: $*"; }
+
+validate_name() {
+  local name="$1"
+  [[ "${name}" =~ ^[a-zA-Z0-9][a-zA-Z0-9._-]{0,63}$ ]] \
+    || die "invalid workspace name '${name}' (allowed: a-zA-Z0-9._-, max 64 chars)"
+}
+
+cmd_create() {
+  local name="" template="" do_git=0
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --git)         do_git=1; shift ;;
+      --template)    template="${2:?--template needs a path}"; shift 2 ;;
+      -h|--help)     usage; exit 0 ;;
+      -*)            die "unknown flag: $1" ;;
+      *)             [ -z "${name}" ] && name="$1" || die "unexpected arg: $1"; shift ;;
+    esac
+  done
+  [ -n "${name}" ] || die "usage: ${SELF} create <name> [--git] [--template <path>]"
+  validate_name "${name}"
+
+  local dest="${WORKSPACES_DIR}/${name}"
+  [ ! -e "${dest}" ] || die "workspace already exists: ${dest}"
+
+  mkdir -p "${dest}"
+
+  if [ -n "${template}" ]; then
+    [ -d "${template}" ] || die "template not found: ${template}"
+    cp -aT "${template}" "${dest}"
+  fi
+
+  if [ ! -e "${dest}/CLAUDE.md" ]; then
+    cat > "${dest}/CLAUDE.md" <<EOF
+# ${name}
+
+Project notes for Claude Code. Document conventions, commands, and gotchas here.
+EOF
+  fi
+
+  if [ "${do_git}" -eq 1 ] && [ ! -d "${dest}/.git" ]; then
+    (cd "${dest}" && git init -q && git add -A && git -c user.email=claude@local -c user.name=claude commit -q -m "Initial workspace" || true)
+  fi
+
+  info "created ${dest}"
+  echo "${dest}"
+}
+
+cmd_list() {
+  [ -d "${WORKSPACES_DIR}" ] || return 0
+  local entry
+  for entry in "${WORKSPACES_DIR}"/*/; do
+    [ -d "${entry}" ] || continue
+    basename "${entry}"
+  done | sort
+}
+
+cmd_remove() {
+  local name="${1:?usage: ${SELF} remove <name>}"
+  validate_name "${name}"
+  local dest="${WORKSPACES_DIR}/${name}"
+  [ -d "${dest}" ] || die "no such workspace: ${name}"
+
+  if [ -t 0 ] && [ "${CC_WORKSPACE_FORCE:-0}" != "1" ]; then
+    read -r -p "Delete ${dest}? [y/N] " ans
+    [[ "${ans}" =~ ^[yY]$ ]] || { info "aborted"; exit 1; }
+  fi
+  rm -rf "${dest}"
+  info "removed ${dest}"
+}
+
+cmd_path() {
+  local name="${1:?usage: ${SELF} path <name>}"
+  validate_name "${name}"
+  local dest="${WORKSPACES_DIR}/${name}"
+  [ -d "${dest}" ] || die "no such workspace: ${name}"
+  echo "${dest}"
+}
+
+cmd_open() {
+  local name="${1:?usage: ${SELF} open <name>}"
+  validate_name "${name}"
+  local dest="${WORKSPACES_DIR}/${name}"
+  [ -d "${dest}" ] || die "no such workspace: ${name}"
+  echo "cd ${dest}"
+}
+
+usage() {
+  cat <<EOF
+Usage: ${SELF} <command> [args]
+
+Commands:
+  create <name> [--git] [--template <path>]   Create a new workspace
+  list                                        List existing workspaces
+  remove <name>                               Delete a workspace
+  path   <name>                               Print absolute path
+  open   <name>                               Print 'cd <path>' for eval
+
+Environment:
+  WORKSPACES_DIR        Base directory (default: /workspaces)
+  CC_WORKSPACE_FORCE=1  Skip confirmation for 'remove'
+EOF
+}
+
+main() {
+  [ $# -ge 1 ] || { usage; exit 1; }
+  local cmd="$1"; shift
+  case "${cmd}" in
+    create) cmd_create "$@" ;;
+    list)   cmd_list "$@" ;;
+    remove|rm|delete) cmd_remove "$@" ;;
+    path)   cmd_path "$@" ;;
+    open)   cmd_open "$@" ;;
+    -h|--help|help) usage ;;
+    *) die "unknown command: ${cmd}" ;;
+  esac
+}
+
+main "$@"

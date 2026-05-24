@@ -1,0 +1,11 @@
+.git
+.gitignore
+.github
+.env
+.env.*
+!.env.example
+data/
+docs/
+README.md
+*.md
+node_modules
