@@ -12,25 +12,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       ca-certificates \
       curl \
       git \
-      gnupg \
       jq \
       openssh-client \
       ripgrep \
-      sudo \
       tini \
       tzdata \
-    && rm -rf /var/lib/apt/lists/*
-
-# Docker CLI only (no daemon). The container talks to a mounted docker.sock
-# when per-project sandboxing is enabled. Keeping the CLI present makes the
-# image usable in that mode without rebuilding.
-RUN install -m 0755 -d /etc/apt/keyrings \
-    && curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc \
-    && chmod a+r /etc/apt/keyrings/docker.asc \
-    && . /etc/os-release \
-    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian ${VERSION_CODENAME} stable" \
-       > /etc/apt/sources.list.d/docker.list \
-    && apt-get update && apt-get install -y --no-install-recommends docker-ce-cli docker-compose-plugin \
     && rm -rf /var/lib/apt/lists/*
 
 ARG CLAUDE_CODE_VERSION=latest
@@ -46,9 +32,7 @@ ARG USER_GID=1000
 # requested UID/GID. Lets bind-mounted ./data inherit the host user's ownership.
 RUN userdel -r node 2>/dev/null || true \
     && groupadd -g ${USER_GID} claude \
-    && useradd -m -u ${USER_UID} -g ${USER_GID} -s /bin/bash claude \
-    && echo 'claude ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/claude \
-    && chmod 0440 /etc/sudoers.d/claude
+    && useradd -m -u ${USER_UID} -g ${USER_GID} -s /bin/bash claude
 
 RUN mkdir -p /workspaces /home/claude/.claude /home/claude/.config \
     && chown -R claude:claude /workspaces /home/claude

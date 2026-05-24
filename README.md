@@ -10,7 +10,7 @@ What's in this repo:
 
 - `Dockerfile` — image build
 - `scripts/cc-workspace` — helper to create/list/remove workspaces
-- `scripts/entrypoint.sh` — bootstrap (Docker socket GID alignment, hints)
+- `scripts/entrypoint.sh` — bootstrap hints (e.g. missing API key)
 - `docker-compose.yml` — local run
 - `.github/workflows/docker-publish.yml` — multi-arch publish to GHCR
 
@@ -93,4 +93,3 @@ UI: http://127.0.0.1:3001 — "Open Project" → `/workspaces/demo`.
 
 - CloudCLI UI: [siteboon/claudecodeui](https://github.com/siteboon/claudecodeui)
 - Claude Code: [Anthropic](https://docs.anthropic.com/en/docs/claude-code)
-- Rootless Docker: [docs.docker.com/engine/security/rootless](https://docs.docker.com/engine/security/rootless/)
