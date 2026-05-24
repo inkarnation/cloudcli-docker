@@ -3,7 +3,6 @@
 FROM node:22-bookworm-slim AS base
 
 ENV DEBIAN_FRONTEND=noninteractive \
-    NODE_ENV=production \
     NPM_CONFIG_UPDATE_NOTIFIER=false \
     NPM_CONFIG_FUND=false \
     PATH=/home/claude/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
@@ -24,9 +23,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # volume in our compose setup), so its image-build version is just a bootstrap
 # and not pinned. CloudCLI has no auto-update, so we pin it explicitly.
 ARG CLOUDCLI_VERSION=1.32.0
+# typescript is bundled globally so CloudCLI plugins whose `npm run build` calls
+# `tsc` directly (without listing it as a dependency) still work.
 RUN npm install -g \
       @anthropic-ai/claude-code \
       @cloudcli-ai/cloudcli@${CLOUDCLI_VERSION} \
+      typescript \
     && npm cache clean --force
 
 ARG PUID=1000
