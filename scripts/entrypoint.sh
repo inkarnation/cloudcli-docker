@@ -31,7 +31,11 @@ if [ "$(id -u)" = "0" ]; then
     "${CLAUDE_HOME}/.claude" \
     "${CLAUDE_HOME}/.cloudcli" \
     "${CLAUDE_HOME}/.config"
-  [ -e "${CLAUDE_HOME}/.claude.json" ] || touch "${CLAUDE_HOME}/.claude.json"
+  # Claude Code parses ~/.claude.json as JSON; a 0-byte file would error.
+  # Seed with empty object if missing or empty.
+  if [ ! -s "${CLAUDE_HOME}/.claude.json" ]; then
+    echo '{}' > "${CLAUDE_HOME}/.claude.json"
+  fi
 
   # Granular chown: recursive for dot-dirs that hold deep state, single-level
   # for workspaces so large project trees aren't re-chowned on every restart.
