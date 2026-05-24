@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     NODE_ENV=production \
     NPM_CONFIG_UPDATE_NOTIFIER=false \
     NPM_CONFIG_FUND=false \
-    PATH=/home/claude/.local/bin:/usr/local/bin:/usr/bin:/bin
+    PATH=/home/claude/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
       ca-certificates \
