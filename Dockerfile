@@ -22,6 +22,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Claude Code self-updates at runtime (writes to ~/.claude/local, which is a
 # volume in our compose setup), so its image-build version is just a bootstrap
 # and not pinned. CloudCLI has no auto-update, so we pin it explicitly.
+# renovate: datasource=npm depName=@cloudcli-ai/cloudcli
 ARG CLOUDCLI_VERSION=1.32.0
 # typescript is bundled globally so CloudCLI plugins whose `npm run build` calls
 # `tsc` directly (without listing it as a dependency) still work.
