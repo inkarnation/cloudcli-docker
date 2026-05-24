@@ -37,13 +37,9 @@ RUN userdel -r node 2>/dev/null || true \
     && groupadd -g ${PGID} claude \
     && useradd -m -u ${PUID} -g ${PGID} -s /bin/bash claude
 
-RUN mkdir -p \
-        /home/claude/workspaces \
-        /home/claude/.claude \
-        /home/claude/.cloudcli \
-        /home/claude/.config \
-    && touch /home/claude/.claude.json \
-    && chown -R claude:claude /home/claude
+# /home/claude is fully bind-mounted at runtime (see compose), so we only need
+# the user account here — the entrypoint mkdir's the data subdirs after the mount.
+RUN chown claude:claude /home/claude
 
 COPY --chmod=0755 scripts/cc-workspace /usr/local/bin/cc-workspace
 COPY --chmod=0755 scripts/entrypoint.sh /usr/local/bin/entrypoint.sh

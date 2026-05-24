@@ -1,9 +1,6 @@
 .env
 .env.*
 !.env.example
-workspaces/
-claude-home/
-cloudcli-data/
-claude.json
+data/
 *.log
 .DS_Store
