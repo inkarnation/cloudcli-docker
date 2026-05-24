@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       ca-certificates \
       curl \
       git \
+      gosu \
       jq \
       openssh-client \
       ripgrep \
@@ -19,20 +20,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       tzdata \
     && rm -rf /var/lib/apt/lists/*
 
-ARG CLAUDE_CODE_VERSION=latest
-ARG CLOUDCLI_VERSION=latest
+# Claude Code self-updates at runtime (writes to ~/.claude/local, which is a
+# volume in our compose setup), so its image-build version is just a bootstrap
+# and not pinned. CloudCLI has no auto-update, so we pin it explicitly.
+ARG CLOUDCLI_VERSION=1.32.0
 RUN npm install -g \
-      @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION} \
+      @anthropic-ai/claude-code \
       @cloudcli-ai/cloudcli@${CLOUDCLI_VERSION} \
     && npm cache clean --force
 
-ARG USER_UID=1000
-ARG USER_GID=1000
+ARG PUID=1000
+ARG PGID=1000
 # Drop the default `node` user from the base image and create `claude` with the
 # requested UID/GID. Lets bind-mounted ./data inherit the host user's ownership.
 RUN userdel -r node 2>/dev/null || true \
-    && groupadd -g ${USER_GID} claude \
-    && useradd -m -u ${USER_UID} -g ${USER_GID} -s /bin/bash claude
+    && groupadd -g ${PGID} claude \
+    && useradd -m -u ${PUID} -g ${PGID} -s /bin/bash claude
 
 RUN mkdir -p /workspaces /home/claude/.claude /home/claude/.config \
     && chown -R claude:claude /workspaces /home/claude
@@ -40,7 +43,8 @@ RUN mkdir -p /workspaces /home/claude/.claude /home/claude/.config \
 COPY --chmod=0755 scripts/cc-workspace /usr/local/bin/cc-workspace
 COPY --chmod=0755 scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 
-USER claude
+# Entrypoint runs as root, applies PUID/PGID env (if set), chowns
+# /workspaces and $HOME, then drops to the claude user via gosu.
 WORKDIR /workspaces
 
 ENV HOME=/home/claude \
