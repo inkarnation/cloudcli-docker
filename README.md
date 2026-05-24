@@ -1,4 +1,4 @@
-# cloudcli-setup
+# cloudcli-docker
 
 Containerized [CloudCLI UI](https://github.com/siteboon/claudecodeui) (web UI for Claude Code)
 for self-hosting on a VPS. The image bundles `@cloudcli-ai/cloudcli`,
