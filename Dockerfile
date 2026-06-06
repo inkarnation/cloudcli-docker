@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # volume in our compose setup), so its image-build version is just a bootstrap
 # and not pinned. CloudCLI has no auto-update, so we pin it explicitly.
 # renovate: datasource=npm depName=@cloudcli-ai/cloudcli
-ARG CLOUDCLI_VERSION=1.33.0
+ARG CLOUDCLI_VERSION=1.33.1
 # typescript is bundled globally so CloudCLI plugins whose `npm run build` calls
 # `tsc` directly (without listing it as a dependency) still work.
 RUN npm install -g \
