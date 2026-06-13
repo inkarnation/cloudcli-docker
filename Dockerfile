@@ -57,6 +57,7 @@ RUN chown claude:claude /home/claude
 
 COPY --chmod=0755 scripts/cc-workspace /usr/local/bin/cc-workspace
 COPY --chmod=0755 scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY --chmod=0644 templates/global-CLAUDE.md /etc/cloudcli/global-CLAUDE.md
 
 # Entrypoint runs as root, applies PUID/PGID env (if set), chowns the data
 # dirs under $HOME, then drops to the claude user via gosu.

@@ -36,6 +36,11 @@ if [ "$(id -u)" = "0" ]; then
   if [ ! -s "${CLAUDE_HOME}/.claude.json" ]; then
     echo '{}' > "${CLAUDE_HOME}/.claude.json"
   fi
+  # Seed the global CLAUDE.md so Claude Code knows about mise + container
+  # conventions. Only on first start — user edits afterwards are preserved.
+  if [ ! -e "${CLAUDE_HOME}/.claude/CLAUDE.md" ] && [ -f /etc/cloudcli/global-CLAUDE.md ]; then
+    cp /etc/cloudcli/global-CLAUDE.md "${CLAUDE_HOME}/.claude/CLAUDE.md"
+  fi
 
   # Granular chown: recursive for dot-dirs that hold deep state, single-level
   # for workspaces so large project trees aren't re-chowned on every restart.

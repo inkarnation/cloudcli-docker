@@ -133,6 +133,11 @@ cd ~/workspaces/some-cloned-repo
 mise install
 ```
 
+The image also seeds a global `~/.claude/CLAUDE.md` on first start so Claude Code itself knows to
+reach for `mise` (and not `apt-get`) when a project needs a JDK or other toolchain. The seed only
+runs when the file is missing — your edits are preserved across image upgrades. To see the source
+template before it gets copied, check `templates/global-CLAUDE.md` in this repo.
+
 ## Putting it on the internet
 
 The container binds to `127.0.0.1` by default. **Don't** expose port 3001 publicly — CloudCLI has no
