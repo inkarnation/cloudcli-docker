@@ -5,19 +5,30 @@ FROM node:22-bookworm-slim AS base
 ENV DEBIAN_FRONTEND=noninteractive \
     NPM_CONFIG_UPDATE_NOTIFIER=false \
     NPM_CONFIG_FUND=false \
-    PATH=/home/claude/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    MISE_DATA_DIR=/home/claude/.local/share/mise \
+    PATH=/home/claude/.local/share/mise/shims:/home/claude/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
+      build-essential \
       ca-certificates \
       curl \
       git \
       gosu \
       jq \
       openssh-client \
+      pkg-config \
       ripgrep \
       tini \
       tzdata \
+      unzip \
+      xz-utils \
     && rm -rf /var/lib/apt/lists/*
+
+# mise: universal language version manager. Toolchains installed per workspace
+# (`mise use java@21`) live under MISE_DATA_DIR, which sits inside the
+# bind-mounted /home/claude volume, so they persist across container restarts.
+RUN curl -fsSL https://mise.run | MISE_INSTALL_PATH=/usr/local/bin/mise sh \
+    && /usr/local/bin/mise --version
 
 # Claude Code self-updates at runtime (writes to ~/.claude/local, which is a
 # volume in our compose setup), so its image-build version is just a bootstrap

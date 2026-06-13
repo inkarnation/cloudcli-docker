@@ -16,6 +16,9 @@ The image bundles:
 
 - `@cloudcli-ai/cloudcli` (pinned) — the web UI
 - `@anthropic-ai/claude-code` — the agent, self-updates at runtime
+- `typescript` (global) — for CloudCLI plugins whose build calls `tsc`
+- [`mise`](https://mise.jdx.dev) — universal toolchain version manager (install Java, Python, Go… per workspace)
+- `build-essential`, `pkg-config`, `unzip`, `xz-utils` — needed for native modules and toolchain builds
 - `git`, `ripgrep`, `jq`, `openssh-client`, `tini`, `gosu`
 - Node 22 on Debian bookworm-slim
 - Multi-arch: `linux/amd64` and `linux/arm64`
@@ -102,6 +105,33 @@ Workspaces are directories, not sandboxes. Claude Code honors its `cwd`, so tool
 `Edit`, `Bash`) operate inside the project folder by default. Cross-project access is technically
 possible (all workspaces share one container filesystem) but constrained by convention and per-project
 `CLAUDE.md` rules. This matches CloudCLI's native single-`~/.claude` model.
+
+## Toolchains per workspace
+
+The base image deliberately ships **only Node 22**. For everything else — JDK, Maven, Python, Go,
+Rust, Ruby, additional Node versions — use [mise](https://mise.jdx.dev) inside the workspace:
+
+```bash
+docker exec -it cloudcli bash
+cd ~/workspaces/my-java-project
+mise use java@21 maven@3.9
+mvn --version
+```
+
+`mise use` writes a `.mise.toml` to the workspace, so the toolchain is pinned per project and
+visible in the repo. Toolchains install into `~/.local/share/mise/`, which lives in the persistent
+`./data` volume — once installed, they survive container restarts and `docker compose pull`.
+
+The mise shim directory is on `PATH` by default, so `java`, `mvn`, `python` etc. work directly in
+the integrated UI terminal and in Claude Code's `Bash` tool without further activation.
+
+If a workspace already has a `.mise.toml`, `mise install` (no args) materializes everything in one
+shot:
+
+```bash
+cd ~/workspaces/some-cloned-repo
+mise install
+```
 
 ## Putting it on the internet
 
