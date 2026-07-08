@@ -27,7 +27,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # mise: universal language version manager. Toolchains installed per workspace
 # (`mise use java@21`) live under MISE_DATA_DIR, which sits inside the
 # bind-mounted /home/claude volume, so they persist across container restarts.
-RUN curl -fsSL https://mise.run | MISE_INSTALL_PATH=/usr/local/bin/mise sh \
+# Releases from v2026.7.0 onward require glibc >= 2.38, which is newer than
+# Debian Bookworm's glibc 2.36, so we pin to the last compatible release.
+# renovate: datasource=github-releases depName=jdx/mise
+ARG MISE_VERSION=v2026.6.14
+RUN curl -fsSL https://mise.run | MISE_INSTALL_PATH=/usr/local/bin/mise MISE_VERSION=${MISE_VERSION} sh \
     && /usr/local/bin/mise --version
 
 # Claude Code self-updates at runtime (writes to ~/.claude/local, which is a
