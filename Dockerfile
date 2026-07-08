@@ -38,7 +38,7 @@ RUN curl -fsSL https://mise.run | MISE_INSTALL_PATH=/usr/local/bin/mise MISE_VER
 # volume in our compose setup), so its image-build version is just a bootstrap
 # and not pinned. CloudCLI has no auto-update, so we pin it explicitly.
 # renovate: datasource=npm depName=@cloudcli-ai/cloudcli
-ARG CLOUDCLI_VERSION=1.35.1
+ARG CLOUDCLI_VERSION=1.36.1
 # typescript is bundled globally so CloudCLI plugins whose `npm run build` calls
 # `tsc` directly (without listing it as a dependency) still work.
 RUN npm install -g \
