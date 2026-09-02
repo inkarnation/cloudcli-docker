@@ -30,7 +30,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Releases from v2026.7.0 onward require glibc >= 2.38, which is newer than
 # Debian Bookworm's glibc 2.36, so we pin to the last compatible release.
 # renovate: datasource=github-releases depName=jdx/mise
-ARG MISE_VERSION=v2026.6.14
+ARG MISE_VERSION=v2026.9.1
 RUN curl -fsSL https://mise.run | MISE_INSTALL_PATH=/usr/local/bin/mise MISE_VERSION=${MISE_VERSION} sh \
     && /usr/local/bin/mise --version
 
